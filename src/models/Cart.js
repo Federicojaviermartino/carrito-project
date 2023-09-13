@@ -15,6 +15,14 @@ const cartSchema = new Schema({
     },
 })
 
+cartSchema.methods.calculateTotal = function () {
+    let total = 0;
+    for (const item of this.items) {
+        total += item.subtotal;
+    }
+    this.total = total;
+};
+
 const Cart = mongoose.model("Cart", cartSchema)
 
 export default Cart

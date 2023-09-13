@@ -25,6 +25,10 @@ const itemSchema = new Schema({
     },
 })
 
+itemSchema.methods.calculateTotal = function () {
+    this.subtotal = this.precioUnitario * this.unidades;
+};
+
 const Item = mongoose.model("Item", itemSchema)
 
 export default Item
