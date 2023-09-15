@@ -3,12 +3,7 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose
 const cartSchema = new Schema({
-    items: [
-        {
-            type: ObjectId,
-            ref: 'Item'
-        }
-    ],
+    items: [],
     total: {
         type: Number,
         required: true,

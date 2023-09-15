@@ -2,12 +2,12 @@ import Producto from '../models/Producto.js';
 
 export const createProducto = async (req, res) => {
     try {
-        const { nombre, precio, thumbnail, descripcion } = req.body;
-        const producto = new Producto({ nombre, precio, thumbnail, descripcion });
+        const { nombre, precio, thumbnail, descripcion, productType } = req.body;
+        const producto = new Producto({ nombre, precio, thumbnail, descripcion, productType });
         const nuevoProducto = await producto.save();
         res.status(201).json(nuevoProducto);
     } catch (error) {
-        res.status(500).json({ error: 'Error al crear el producto' });
+        res.status(500).json({ error: 'Error al crear el producto', message: error.message });
     }
 };
 
@@ -23,10 +23,10 @@ export const getProductos = async (req, res) => {
 export const updateProducto = async (req, res) => {
     try {
         const { id } = req.params;
-        const { nombre, precio, thumbnail, descripcion } = req.body;
+        const { nombre, precio, thumbnail, descripcion, productType } = req.body;
         const producto = await Producto.findByIdAndUpdate(
             id,
-            { nombre, precio, thumbnail, descripcion },
+            { nombre, precio, thumbnail, descripcion, productType },
             { new: true }
         );
         if (!producto) {

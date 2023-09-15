@@ -1,21 +1,32 @@
 import Cart from '../models/Cart.js';
-import Item from '../models/Item.js';
-
+import Producto from '../models/Producto.js';
 export const addToCart = async (req, res) => {
     try {
         const { productId, unidades } = req.body;
         const cartId = req.params.id;
-        const item = new Item();
-        let cart = await Cart.findById(cartId);
-        if (!cart) {
+        let cart = null
+        if (cartId === true) {
+            cart = await Cart.findById(cartId);
+            if (!cart) {
+                cart = new Cart({ _id: cartId, items: [] });
+            }
+        }
+        else {
             cart = new Cart({ _id: cartId, items: [] });
         }
-
         const existingItem = cart.items.find((item) => item.productId === productId);
         if (existingItem) {
-            existingItem.unidades += unidades;
+            existingItem.unidades += 1;
         } else {
-            cart.items.push({ productId, unidades });
+            const product = await Producto.findById(productId)
+            cart.items.push({
+                productId,
+                nombreItem: product.nombre,
+                tipoItem: product.productType,
+                unidades,
+                precioUnitario: product.precio,
+                subtotal: product.precio * unidades,
+            });
         }
 
         const updatedCart = await cart.save();
@@ -28,19 +39,16 @@ export const addToCart = async (req, res) => {
 export const removeFromCart = async (req, res) => {
     try {
         const { productId } = req.params;
-        const cartId = req.params.id; // ID del carrito
+        const cartId = req.params.id;
 
-        // Buscar el carrito por ID
         const cart = await Cart.findById(cartId);
 
         if (!cart) {
             return res.status(404).json({ error: 'Carrito no encontrado' });
         }
 
-        // Filtrar los ítems para eliminar el ítem por productId
         cart.items = cart.items.filter((item) => item.productId !== productId);
 
-        // Guardar el carrito actualizado en la base de datos
         const updatedCart = await cart.save();
         res.json(updatedCart);
     } catch (error) {

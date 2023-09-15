@@ -12,6 +12,13 @@ const productoSchema = new Schema({
     },
     thumbnail: String,
     descripcion: String,
+    productType: {
+        enum: [
+            "product", "event"
+        ],
+        type: String,
+        required: true,
+    },
 })
 
 const Producto = mongoose.model("Producto", productoSchema)
