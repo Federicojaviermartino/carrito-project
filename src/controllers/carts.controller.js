@@ -5,7 +5,7 @@ export const addToCart = async (req, res) => {
         const { productId, unidades } = req.body;
         const cartId = req.params.id;
         let cart = null
-        if (cartId === true) {
+        if (cartId) {
             cart = await Cart.findById(cartId);
             if (!cart) {
                 cart = new Cart({ _id: cartId, items: [] });
@@ -16,7 +16,8 @@ export const addToCart = async (req, res) => {
         }
         const existingItem = cart.items.find((item) => item.productId === productId);
         if (existingItem) {
-            existingItem.unidades += 1;
+            existingItem.unidades = existingItem.unidades + 1;
+            existingItem.subtotal = existingItem.precioUnitario * parseInt(existingItem.unidades);
         } else {
             const product = await Producto.findById(productId)
             cart.items.push({
@@ -25,14 +26,14 @@ export const addToCart = async (req, res) => {
                 tipoItem: product.productType,
                 unidades,
                 precioUnitario: product.precio,
-                subtotal: product.precio * unidades,
+                subtotal: product.precio * parseInt(unidades),
             });
         }
-
+        cart.calculateTotal()
         const updatedCart = await cart.save();
         res.json(updatedCart);
     } catch (error) {
-        res.status(500).json({ error: 'Error al agregar al carrito' });
+        res.status(500).json({ error: 'Error al agregar al carrito', message: error.message });
     }
 };
 
